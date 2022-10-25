@@ -48,7 +48,7 @@ string_append_byte:
   mov  r10, [rdi + struct_string_data]
   add  r10, [rdi + struct_string_written]
 
-  mov  r11, r10
+  mov  r11, [rdi + struct_string_written]
   mov  r12, [rdi + struct_string_cap]
   
   // if written >= string.cap
@@ -81,5 +81,68 @@ string_write_to:
   // rdx = string.written
   mov rdx, [r10 + struct_string_written]
   syscall
+  leave
+  ret
+
+.global string_append_num
+string_append_num:
+  enter 24, 0
+  /*
+  0 = string
+  8 = num
+  */
+  mov  [rbp - 0], rdi
+  mov  [rbp - 8], rsi
+
+  mov r10, 0 // char counter
+
+  cmp  rsi, 0
+  jne  .string_append_num_loop
+
+  mov rsi, '0'
+  call string_append_byte
+  
+  xor eax, eax
+  jmp .string_append_num_ret
+
+
+  .string_append_num_loop:
+  mov  rdx, [rbp - 8] 
+  cmp  rdx, 0
+  mov  rax, 0
+  je   .string_append_num_loop_end
+
+  mov  rax, rdx
+  cqo
+  mov  r11, 10
+  idivq r11 // rdx = num%10; rax = num / 10
+  mov  [rbp - 8], rax
+  
+  mov  rdi, [rbp - 0]
+  mov  rsi, rdx
+  add  rsi, '0' // rsi += '0'
+  push rsi
+  inc  r10
+  jmp .string_append_num_loop
+  .string_append_num_loop_end:
+  
+  .string_append_num_bytes:
+  
+  cmp r10, 0
+  je .string_append_num_ret
+
+  mov  rdi, [rbp - 0]
+  pop  rsi
+  push r10
+  call string_append_byte
+  pop  r10
+
+  cmp  rax, -1
+  je   .string_append_num_ret
+  
+  dec  r10
+  jmp  .string_append_num_bytes
+
+  .string_append_num_ret:
   leave
   ret

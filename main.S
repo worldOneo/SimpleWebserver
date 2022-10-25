@@ -37,16 +37,8 @@ main:
     
     mov  [rbp - 0], rax
     mov  rdi, rax
-    mov  rsi, 'H'
-    call string_append_byte
-
-    mov  rdi, [rbp - 0]
-    mov  rsi, 'i'
-    call string_append_byte
-
-    mov  rdi, [rbp - 0]
-    mov  rsi, '\n'
-    call string_append_byte
+    mov  rsi, 1337
+    call string_append_num
 
     mov  rdi, [rbp - 0]
     mov  rsi, 1
