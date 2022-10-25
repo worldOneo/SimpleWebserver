@@ -22,17 +22,37 @@ Assume everything is clobbered :D
 .section .text
 .globl main
 main:
-    enter 0, 0
+    enter 8, 0
+    /*
+    0 = string
+    */
     mov rax, 1
     mov rdi, 1
     mov rsi, offset msg
     mov rdx, 12
     syscall
 
-    mov rdi, 10
+    mov  rdi, 10
     call string_alloc_size
+    
+    mov  [rbp - 0], rax
+    mov  rdi, rax
+    mov  rsi, 'H'
+    call string_append_byte
+
+    mov  rdi, [rbp - 0]
+    mov  rsi, 'i'
+    call string_append_byte
+
+    mov  rdi, [rbp - 0]
+    mov  rsi, '\n'
+    call string_append_byte
+
+    mov  rdi, [rbp - 0]
+    mov  rsi, 1
+    call string_write_to
+
 
     mov rax, 60
     mov rdi, 0
     syscall
-    leave
